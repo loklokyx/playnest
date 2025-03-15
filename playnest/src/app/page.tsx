@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Search, User, Bell } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import GameBubble from "@/components/game-bubble";
 import CreateGameModal from "@/components/create-game-modal";
@@ -14,6 +15,8 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
+import { account } from "@/app/auth/auth"
+
 
 // Update the game type to include position
 interface Game {
@@ -28,6 +31,7 @@ interface Game {
   joined: boolean;
   position?: { x: number; y: number };
 }
+
 
 // Sample game data
 const initialGames = [
@@ -92,7 +96,39 @@ export default function Home() {
   const [games, setGames] = useState<Game[]>(initialGames as Game[]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+   // ✅ check if user is already logged in
+   useEffect(() => {
+    const checkUserSession = async () => {
+      try {
+        const user = await account.get();
+        if (user) setIsLoggedIn(true);
+      } catch (err) {
+        setIsLoggedIn(false);
+      }
+    };
+    checkUserSession();
+  }, []);
+
+  // ✅ handle logout
+  const logout = async () => {
+    try {
+      await account.deleteSession("current");
+      setIsLoggedIn(false);
+      setIsMenuOpen(false);
+      router.push("/auth/login"); // redirect to login page
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  // ✅ handle menu toggle, open or close
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
   // Configure sensors for drag
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -185,13 +221,42 @@ export default function Home() {
             <Button variant="ghost" size="icon" className="rounded-full">
               <Bell className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <User className="h-5 w-5" />
-            </Button>
+
+            {/* ✅ User Button with Dropdown */}
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full  cursor-pointer"
+                onClick={toggleMenu}
+              >
+                <User className="h-5 w-5" />
+              </Button>
+
+              {isMenuOpen && (
+                <div className="absolute right-0 mt-2 w-36 bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
+                  {isLoggedIn ? (
+                    <button
+                      onClick={logout}
+                      className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100  cursor-pointer"
+                    >
+                      Logout
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => router.push("/auth/login")}
+                      className="w-full text-left px-4 py-2 text-indigo-600 hover:bg-gray-100 cursor-pointer"
+                    >
+                      Log in
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
-
+    
       {/* Tabs */}
       <div className="container mx-auto px-4 pt-4">
         <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { account } from "../auth";
 import { useRouter } from "next/navigation";
 
@@ -12,15 +12,33 @@ const LoginPage: React.FC = () => {
   const router = useRouter();
 
   /**
+   * ✅ Check if user is already logged in
+   */
+  useEffect(() => {
+    const checkUserSession = async () => {
+      try {
+        const user = await account.get(); // ✅ Get the current user
+        if (user) {
+          setLoggedInUser(user);
+          router.push("/"); // ✅ Redirect to home or dashboard if user is already logged in
+        }
+      } catch (err) {
+        console.log("No active session, user not logged in.");
+      }
+    };
+    checkUserSession();
+  }, []);
+
+  /**
    * User login
    */
-  const Login = async (): Promise<void> => {
+  const login = async (): Promise<void> => {
     setError(null);
     try {
       await account.createEmailPasswordSession(email, password);
       const user = await account.get();
       setLoggedInUser(user);
-      router.push("/"); // Redirect to home page after login
+      router.push("/"); // ✅ Redirect to home or dashboard after login
     } catch (err) {
       setError("Login failed. Please try again.");
       console.error("Login failed:", err);
@@ -34,6 +52,7 @@ const LoginPage: React.FC = () => {
     try {
       await account.deleteSession("current");
       setLoggedInUser(null);
+      router.push("/auth/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -43,7 +62,7 @@ const LoginPage: React.FC = () => {
     return (
       <div className="mt-8 bg-white shadow-lg rounded-lg p-6 w-96 text-center">
         <p className="text-gray-700 text-lg font-medium">
-          Logged in already:{" "}
+          Logged in as:{" "}
           <span className="font-semibold text-blue-500">{loggedInUser.name}</span>
         </p>
         <button
@@ -79,15 +98,15 @@ const LoginPage: React.FC = () => {
           />
           <button
             type="button"
-            onClick={Login}
-            className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+            onClick={login}
+            className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition  cursor-pointer"
           >
             Login
           </button>
         </form>
         <p className="text-center text-sm mt-4">
           Don't have an account yet?{" "}
-          <a href="/auth/register" className="text-blue-500 hover:underline">
+          <a href="/register" className="text-blue-500 hover:underline  cursor-pointer">
             Register now
           </a>
         </p>
