@@ -143,7 +143,9 @@ export default function Home() {
             <GameBubble game={game} onJoin={handleJoinGame} />
           ) : game.status === "matched" ? (
             <MatchedBubble matchedPeople={matchedPeople} />
-          ) : "Error Status Found"}
+          ) : (
+            "Error Status Found"
+          )}
         </div>
       </div>
     </div>

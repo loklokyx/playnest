@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { account } from "../auth";
 import { redirect } from "next/navigation";
+import { motion } from "framer-motion";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -52,7 +53,19 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white shadow-lg rounded-lg p-8 w-96">
+      <div className="flex items-center">
+        <motion.div
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1 }}
+          className="mr-2 w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center"
+        >
+          <span className="text-white font-bold">P</span>
+        </motion.div>
+        <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          PlayNest
+        </h1>
+      </div>
+      <div className="bg-white shadow-lg rounded-lg p-8 w-96 my-4">
         <h2 className="text-center text-2xl font-bold text-gray-700 mb-2">
           Login
         </h2>
