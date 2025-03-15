@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import GameBubble, { Game } from "@/components/game-bubble";
 import CreateGameModal from "@/components/create-game-modal";
 import { toast } from "sonner";
-import MatchedBubble, { MatchedPerson } from "@/components/matched-bubble";
 import { account } from "./(auth)/auth";
 import { redirect } from "next/navigation";
+import NewBubble from "@/components/new-bubble";
+import MatchedBubble, { MatchedPerson } from "@/components/matched-bubble";
 
 const game = {
   id: "1",
@@ -34,7 +35,7 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // ✅ check if user is already logged in
+  // check if user is already logged in
   useEffect(() => {
     const checkUserSession = async () => {
       try {
@@ -48,7 +49,7 @@ export default function Home() {
     checkUserSession();
   }, []);
 
-  // ✅ handle logout
+  // handle logout
   const logout = async () => {
     try {
       await account.deleteSession("current");
@@ -61,7 +62,7 @@ export default function Home() {
     }
   };
 
-  // ✅ handle menu toggle, open or close
+  // handle menu toggle, open or close
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -96,7 +97,7 @@ export default function Home() {
               <Bell className="h-5 w-5" />
             </Button>
 
-            {/* ✅ User Button with Dropdown */}
+            {/* User Button with Dropdown */}
             <div className="relative">
               <Button
                 variant="ghost"
@@ -146,7 +147,9 @@ export default function Home() {
             <GameBubble game={game} onJoin={handleJoinGame} />
           ) : game.status === "matched" ? (
             <MatchedBubble matchedPeople={matchedPeople} />
-          ) : null}
+          ) : (
+            <NewBubble />
+          )}
         </div>
       </div>
 

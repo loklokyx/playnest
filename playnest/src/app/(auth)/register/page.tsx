@@ -20,8 +20,7 @@ const RegisterPage: React.FC = () => {
     } catch (err) {
       setError("Register failed. Please try again.");
       console.error("Register failed:", err);
-    }
-    finally {
+    } finally {
       redirect("/login");
     }
   };
