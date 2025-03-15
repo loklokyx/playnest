@@ -1,12 +1,8 @@
-import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Users, Clock, MapPin, Zap } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
-import { useDraggable } from "@dnd-kit/core";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
-type GameStatus = "pending" | "matched" | "finished";
+type GameStatus = "pending" | "joined";
 
 export interface Game {
   id: string;
@@ -24,217 +20,80 @@ export interface Game {
 interface GameBubbleProps {
   game: Game;
   onJoin: (gameId: string) => void;
-  index: number;
-  // onDragEnd?: (id: string, position: { x: number; y: number }) => void;
 }
 
-export default function GameBubble({
-  game,
-  onJoin,
-  index,
-  // onDragEnd,
-}: GameBubbleProps) {
-  const [taps, setTaps] = useState(0);
-  const [showSpeedUp, setShowSpeedUp] = useState(false);
-  const [speedUpProgress, setSpeedUpProgress] = useState(0);
-  const [isExpanding, setIsExpanding] = useState(false);
-  const [isBursting, setIsBursting] = useState(false);
-  const progressInterval = useRef<NodeJS.Timeout | null>(null);
+const MAX_COUNT = 10;
 
-  // Make the bubble draggable
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: game.id,
-    data: {
-      game,
-    },
-  });
-
-  // Calculate size based on players joined and capacity - more flexible sizing
-  const screenWidth = typeof window !== "undefined" ? window.innerWidth : 1024;
-  const isMobile = screenWidth < 640;
-
-  // Base size is now responsive to screen size
-  const baseSize = isMobile ? 100 : Math.min(120, screenWidth * 0.12);
-  const maxSizeIncrease = isMobile ? 50 : 60;
-  const fillRatio = game.playersJoined / game.capacity;
-  const size = baseSize + fillRatio * maxSizeIncrease;
-
-  // Position based on provided position or calculate
-  const xPos =
-    game.position?.x || (index % 3) * (baseSize * 0.7) + Math.random() * 20;
-  const yPos =
-    game.position?.y ||
-    Math.floor(index / 3) * (baseSize * 0.8) + Math.random() * 30;
-
-  // Color based on status
-  const getBubbleColor = () => {
-    if (game.isOwner) return "from-amber-400 to-orange-500";
-    if (game.status === "matched") return "from-green-400 to-emerald-500";
-    if (game.joined) return "from-blue-400 to-indigo-500";
-    return "from-indigo-400 to-purple-500";
-  };
+export default function GameBubble({ game, onJoin }: GameBubbleProps) {
+  const [clickCount, setClickCount] = useState(0);
+  const [size, setSize] = useState(1);
+  const [burst, setBurst] = useState(false);
+  const [toastShown, setToastShown] = useState(false);
 
   const handleTap = () => {
-    if (game.joined || game.status === "matched") return;
+    if (game.status === "pending" || game.status === "joined") {
+      setClickCount((prev) => prev + 1);
 
-    setTaps((prev) => {
-      const newTaps = prev + 1;
-
-      // Join after 3 taps
-      if (newTaps >= 3) {
-        onJoin(game.id);
-        setShowSpeedUp(true);
-      }
-
-      return newTaps;
-    });
-
-    setIsExpanding(true);
-    setTimeout(() => {
-      setIsExpanding(false);
-    }, 300);
-  };
-
-  const handleSpeedUp = () => {
-    if (progressInterval.current) {
-      clearInterval(progressInterval.current);
-    }
-
-    // Increment taps for speed up effect
-    setTaps((prev) => prev + 1);
-
-    // Only burst after enough taps (8 total taps)
-    if (taps >= 7) {
-      setIsBursting(true);
-      setTimeout(() => {
-        setIsBursting(false);
-        setTaps(0);
-      }, 1000);
-      return;
-    }
-
-    // Otherwise just increase progress
-    progressInterval.current = setInterval(() => {
-      setSpeedUpProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(progressInterval.current as NodeJS.Timeout);
-          return 0;
+      // Increase size with each click
+      if (clickCount < MAX_COUNT) {
+        setSize(1 + (clickCount + 1) * 0.03); // Gradually enlarge
+      } else {
+        // Burst animation when clicked too much
+        setBurst(true);
+        if (!toastShown) {
+          setToastShown(true);
+          toast.success(
+            game.status === "pending"
+              ? "You've requested to join this game. The owner will be notified."
+              : "The game owner has been notified that you want to speed up the matching process.",
+          );
         }
-        return prev + 5;
-      });
-    }, 200);
-  };
 
-  useEffect(() => {
-    return () => {
-      if (progressInterval.current) {
-        clearInterval(progressInterval.current);
+        // Reset after delay
+        setTimeout(() => {
+          setClickCount(0);
+          setSize(1);
+          setToastShown(false);
+          setBurst(false);
+        }, 1000); // Delay the reset
       }
-    };
-  }, []);
-
-  // Burst animation when game is full - but don't loop
-  useEffect(() => {
-    if (game.playersJoined >= game.capacity && !isBursting) {
-      setIsBursting(true);
-      setTimeout(() => {
-        setIsBursting(false);
-      }, 1000);
     }
-  }, [isBursting, game.playersJoined, game.capacity]);
-
-  // Calculate scale based on taps for progressive enlargement
-  const getScale = () => {
-    if (isBursting) return [1, 1.2, 0];
-    if (isExpanding) return 1.05;
-
-    // Gradually increase scale with taps
-    const tapScale = 1 + Math.min(taps, 7) * 0.02;
-    return tapScale;
   };
+
+  // Slowly shrink back if not clicked
+  useEffect(() => {
+    if (clickCount > 0 && !burst) {
+      const timer = setTimeout(() => {
+        setSize((prev) => Math.max(1, prev - 0.01)); // Shrink back slowly
+        if (size <= 1.01) {
+          setClickCount(0);
+          setSize(1);
+        }
+      }, 200);
+
+      return () => clearTimeout(timer);
+    }
+  }, [clickCount, size, burst]);
 
   return (
     <motion.div
-      ref={setNodeRef}
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{
-        scale: getScale(),
-        opacity: isBursting ? [1, 1, 0] : 1,
-        x: transform ? transform.x + xPos : xPos,
-        y: transform ? transform.y + yPos : yPos,
-      }}
-      exit={{ scale: 0, opacity: 0 }}
-      transition={{
-        type: "spring",
-        stiffness: 300,
-        damping: 20,
-        scale: { duration: isBursting ? 0.5 : 0.2 },
-      }}
-      className={cn(
-        "absolute rounded-full flex flex-col items-center justify-center p-4 shadow-lg cursor-grab active:cursor-grabbing",
-        "bg-gradient-to-br",
-        getBubbleColor(),
-        game.status === "matched" && "animate-pulse",
-      )}
-      style={{
-        width: `${size}px`,
-        height: `${size}px`,
-        touchAction: "none",
-      }}
       onClick={handleTap}
-      whileHover={{
-        scale: game.joined ? getScale() : (getScale() as number) * 1.03,
+      className="relative flex items-center justify-center rounded-full p-4 bg-gradient-to-br from-indigo-400 to-purple-500 shadow-lg cursor-pointer"
+      style={{
+        width: "60vw",
+        height: "60vw",
+        touchAction: "none",
+        borderRadius: "50%", // Ensure it's round
       }}
-      {...attributes}
-      {...listeners}
+      animate={{ scale: size }} // Animate size change only
+      transition={{ duration: 0.3 }} // Smooth transition for size change
     >
-      <div className="text-white font-bold text-sm mb-1">{game.type}</div>
-
-      <div className="flex items-center text-white/90 text-[10px] mb-1">
-        <MapPin className="w-3 h-3 mr-1" />
-        {game.location}
-      </div>
-
-      <div className="flex items-center text-white/90 text-[10px] mb-1">
-        <Clock className="w-3 h-3 mr-1" />
-        {game.time}
-      </div>
-
-      <div className="flex items-center text-white/90 text-[10px] mb-2">
-        <Users className="w-3 h-3 mr-1" />
-        {game.playersJoined}/{game.capacity}
-      </div>
-
-      {game.status === "matched" ? (
-        <div className="bg-white/20 rounded-full px-3 py-1 text-xs text-white font-medium">
-          Ready to Play!
-        </div>
-      ) : game.joined ? (
-        <div className="bg-white/20 rounded-full px-3 py-1 text-xs text-white font-medium">
-          Joined
-        </div>
-      ) : (
-        <div className="bg-white/20 rounded-full px-3 py-1 text-xs text-white font-medium animate-pulse">
-          Join
+      {burst && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center">
+          <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></div>
         </div>
       )}
-
-      {showSpeedUp && game.joined && game.status !== "matched" && (
-        <div className="mt-2 w-full max-w-[120px]">
-          <Progress value={speedUpProgress} className="h-2 bg-white/30" />
-          <Button
-            size="sm"
-            variant="secondary"
-            className="mt-2 w-full bg-white/20 hover:bg-white/30 text-white text-xs py-1 h-7"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleSpeedUp();
-            }}
-          >
-            <Zap className="w-3 h-3 mr-1" /> Speed Up ({8 - taps} more)
-          </Button>
-        </div>
-      )}
+      <div className="text-white font-bold text-4xl">Join Game</div>
     </motion.div>
   );
 }

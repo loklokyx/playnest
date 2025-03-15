@@ -1,5 +1,6 @@
 import type React from "react";
 import "@/app/globals.css";
+import { Toaster } from "sonner";
 
 export const metadata = {
   title: "PlayNest - Find & Join Games",
@@ -14,7 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Toaster position="bottom-right" />
+      </body>
     </html>
   );
 }
