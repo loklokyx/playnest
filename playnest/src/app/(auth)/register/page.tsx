@@ -17,10 +17,12 @@ const RegisterPage: React.FC = () => {
     setError(null);
     try {
       await account.create(ID.unique(), email, password, name);
-      redirect("/login"); // Redirect to login page
     } catch (err) {
       setError("Register failed. Please try again.");
       console.error("Register failed:", err);
+    }
+    finally {
+      redirect("/login");
     }
   };
 
