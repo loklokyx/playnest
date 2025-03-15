@@ -8,7 +8,9 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [loggedInUser, setLoggedInUser] = useState<{ name: string } | null>(null);
+  const [loggedInUser, setLoggedInUser] = useState<{ name: string } | null>(
+    null,
+  );
   const router = useRouter();
 
   /**
@@ -44,7 +46,9 @@ const LoginPage: React.FC = () => {
       <div className="mt-8 bg-white shadow-lg rounded-lg p-6 w-96 text-center">
         <p className="text-gray-700 text-lg font-medium">
           Logged in already:{" "}
-          <span className="font-semibold text-blue-500">{loggedInUser.name}</span>
+          <span className="font-semibold text-blue-500">
+            {loggedInUser.name}
+          </span>
         </p>
         <button
           type="button"
@@ -62,7 +66,10 @@ const LoginPage: React.FC = () => {
       <div className="bg-white shadow-lg rounded-lg p-8 w-96">
         <h2 className="text-center text-2xl font-bold text-gray-700">Login</h2>
         {error && <p className="text-red-500 text-center mt-2">{error}</p>}
-        <form className="space-y-4 text-black" onSubmit={(e) => e.preventDefault()}>
+        <form
+          className="space-y-4 text-black"
+          onSubmit={(e) => e.preventDefault()}
+        >
           <input
             type="email"
             placeholder="Email"
@@ -86,8 +93,8 @@ const LoginPage: React.FC = () => {
           </button>
         </form>
         <p className="text-center text-sm mt-4">
-          Don't have an account yet?{" "}
-          <a href="/auth/register" className="text-blue-500 hover:underline">
+          Don&apos;t have an account yet?{" "}
+          <a href="/register" className="text-blue-500 hover:underline">
             Register now
           </a>
         </p>

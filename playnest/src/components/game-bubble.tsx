@@ -47,6 +47,7 @@ export default function GameBubble({ game, onJoin }: GameBubbleProps) {
               ? "You've requested to join this game. The owner will be notified."
               : "The game owner has been notified that you want to speed up the matching process.",
           );
+          onJoin;
         }
 
         // Reset after delay
@@ -93,7 +94,9 @@ export default function GameBubble({ game, onJoin }: GameBubbleProps) {
           <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></div>
         </div>
       )}
-      <div className="text-white font-bold text-4xl">Join Game</div>
+      <div className="text-white font-bold text-2xl sm:text-6xl lg:text-8xl">
+        Join Game
+      </div>
     </motion.div>
   );
 }
