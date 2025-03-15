@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { User, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import GameBubble, { Game } from "@/components/game-bubble";
-import CreateGameModal from "@/components/create-game-modal";
 import { toast } from "sonner";
 import { account } from "./(auth)/auth";
 import { redirect } from "next/navigation";
