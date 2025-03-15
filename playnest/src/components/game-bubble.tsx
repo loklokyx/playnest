@@ -182,7 +182,7 @@ export default function GameBubble({
         touchAction: "none",
       }}
       onClick={handleTap}
-      whileHover={{ scale: game.joined ? getScale() : getScale() * 1.03 }}
+      whileHover={{ scale: game.joined ? getScale() : getScale() as number * 1.03 }}
       {...attributes}
       {...listeners}
     >
