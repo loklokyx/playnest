@@ -8,7 +8,7 @@ import { useDraggable } from "@dnd-kit/core";
 
 type GameStatus = "pending" | "matched" | "finished";
 
-interface Game {
+export interface Game {
   id: string;
   type: string;
   location: string;
@@ -182,7 +182,9 @@ export default function GameBubble({
         touchAction: "none",
       }}
       onClick={handleTap}
-      whileHover={{ scale: game.joined ? getScale() : getScale() as number * 1.03 }}
+      whileHover={{
+        scale: game.joined ? getScale() : (getScale() as number) * 1.03,
+      }}
       {...attributes}
       {...listeners}
     >

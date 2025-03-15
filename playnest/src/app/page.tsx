@@ -149,22 +149,13 @@ export default function Home() {
     setGames(
       games.map((game) => {
         if (game.id === gameId) {
-          const container = document.getElementById("game-container");
-          const containerRect = container?.getBoundingClientRect();
-          const newX = Math.max(
-            0,
-            Math.min(delta.x, containerRect?.width || 0),
-          );
-          const newY = Math.max(
-            0,
-            Math.min(delta.y, containerRect?.height || 0),
-          );
-
+          // Calculate new position
+          const currentPosition = game.position || { x: 0, y: 0 };
           return {
             ...game,
             position: {
-              x: newX,
-              y: newY,
+              x: currentPosition.x + delta.x,
+              y: currentPosition.y + delta.y,
             },
           };
         }
@@ -253,7 +244,7 @@ export default function Home() {
 
       {/* Game Bubbles */}
       <div className="container mx-auto px-4 py-6 flex-grow">
-        <div id="game-container" className="relative h-full min-h-[400px]">
+        <div className="relative h-full min-h-[400px]">
           <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
             <AnimatePresence>
               {filteredGames.map((game, index) => (

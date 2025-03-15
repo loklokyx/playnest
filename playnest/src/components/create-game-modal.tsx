@@ -7,11 +7,12 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import { Game } from "./game-bubble";
 
 interface CreateGameModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateGame: (game: any) => void;
+  onCreateGame: (game: Game) => void;
 }
 
 const gameTypes = [
