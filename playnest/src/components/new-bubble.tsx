@@ -2,13 +2,13 @@ import { redirect } from "next/navigation";
 
 const NewBubble = () => {
   const handleRedirect = () => {
-    redirect("/");
+    redirect("/request-form");
   };
 
   return (
     <div
       onClick={handleRedirect}
-      className="relative flex items-center justify-center rounded-full p-4 bg-gradient-to-br from-green-400 to-blue-500 shadow-lg cursor-pointer"
+      className="select-none relative flex items-center justify-center rounded-full p-4 bg-gradient-to-br from-green-400 to-blue-500 shadow-lg cursor-pointer"
       style={{
         width: "60vw",
         height: "60vw",

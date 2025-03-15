@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { MdCancel } from "react-icons/md";
 
-type GameStatus = "new" | "pending" | "matched" | "joined";
+type GameStatus = "pending" | "matched";
 
 export interface Game {
   id: string;
@@ -32,7 +32,7 @@ export default function GameBubble({ game, onJoin }: GameBubbleProps) {
   const [toastShown, setToastShown] = useState(false);
 
   const handleTap = () => {
-    if (game.status === "pending" || game.status === "joined") {
+    if (game.status === "pending") {
       setClickCount((prev) => prev + 1);
 
       // Increase size with each click

@@ -18,7 +18,7 @@ const game = {
   time: "3:00 PM",
   playersJoined: 3,
   capacity: 4,
-  status: "new",
+  status: "pending",
   isOwner: false,
   joined: false,
 } as Game;
@@ -137,13 +137,15 @@ export default function Home() {
       {/* Game Bubble */}
       <div className="container mx-auto">
         <div className="w-full flex items-center justify-center py-4 pb-8">
-          {game.status === "pending" ? (
+          {!game ? (
+            <NewBubble />
+          ) : game.status === "pending" ? (
             <GameBubble game={game} onJoin={handleJoinGame} />
           ) : game.status === "matched" ? (
             <MatchedBubble matchedPeople={matchedPeople} />
-          ) : game.status === "new" ? (
-            <NewBubble />
-          ) : null}
+          ) : (
+            "Error Status Found"
+          )}
         </div>
       </div>
     </div>

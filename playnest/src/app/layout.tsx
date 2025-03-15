@@ -1,6 +1,7 @@
 import type React from "react";
 import "@/app/globals.css";
 import { Toaster } from "sonner";
+import { GameFormContextProvider } from "@/components/context/multistep-form-context";
 
 export const metadata = {
   title: "PlayNest - Find & Join Games",
@@ -16,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        {children}
+        <GameFormContextProvider>{children}</GameFormContextProvider>
         <Toaster position="bottom-right" />
       </body>
     </html>
