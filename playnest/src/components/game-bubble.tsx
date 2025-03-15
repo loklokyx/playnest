@@ -25,14 +25,14 @@ interface GameBubbleProps {
   game: Game;
   onJoin: (gameId: string) => void;
   index: number;
-  onDragEnd?: (id: string, position: { x: number; y: number }) => void;
+  // onDragEnd?: (id: string, position: { x: number; y: number }) => void;
 }
 
 export default function GameBubble({
   game,
   onJoin,
   index,
-  onDragEnd,
+  // onDragEnd,
 }: GameBubbleProps) {
   const [taps, setTaps] = useState(0);
   const [showSpeedUp, setShowSpeedUp] = useState(false);
@@ -141,7 +141,7 @@ export default function GameBubble({
         setIsBursting(false);
       }, 1000);
     }
-  }, [game.playersJoined, game.capacity]);
+  }, [isBursting, game.playersJoined, game.capacity]);
 
   // Calculate scale based on taps for progressive enlargement
   const getScale = () => {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Users, Clock, MapPin } from "lucide-react";
+import { X, Users, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,7 +42,6 @@ export default function CreateGameModal({
   const [location, setLocation] = useState("");
   const [time, setTime] = useState("");
   const [capacity, setCapacity] = useState(4);
-  const [note, setNote] = useState("");
 
   const handleNext = () => {
     setStep(step + 1);
@@ -63,8 +62,7 @@ export default function CreateGameModal({
       location: selectedLocation,
       time,
       capacity,
-      note,
-    });
+    } as Game);
 
     // Reset form
     setStep(1);
@@ -72,7 +70,6 @@ export default function CreateGameModal({
     setLocation("");
     setTime("");
     setCapacity(4);
-    setNote("");
   };
 
   const modalVariants = {
@@ -239,20 +236,6 @@ export default function CreateGameModal({
                       step={1}
                       onValueChange={(value) => setCapacity(value[0])}
                       className="flex-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="note">Add a note (optional)</Label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 text-gray-400 h-4 w-4" />
-                    <textarea
-                      id="note"
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                      placeholder="Add any additional information..."
-                      className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[80px]"
                     />
                   </div>
                 </div>

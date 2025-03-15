@@ -126,7 +126,7 @@ export default function Home() {
     );
   };
 
-  const handleCreateGame = (newGame: any) => {
+  const handleCreateGame = (newGame: Game) => {
     setGames([
       ...games,
       {
