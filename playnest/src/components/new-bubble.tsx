@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 const NewBubble = () => {
   const handleRedirect = () => {
-    redirect("/");
+    redirect("/request-form");
   };
 
   return (
