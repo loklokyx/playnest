@@ -1,7 +1,6 @@
 "use client";
-import { client, account } from "@/app/(auth)/auth";
+import { account } from "@/app/(auth)/auth";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 export default function ProfilePage() {
@@ -11,7 +10,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
- 
+
   // ✅ 获取用户信息
   useEffect(() => {
     const fetchUser = async () => {
@@ -22,6 +21,7 @@ export default function ProfilePage() {
         setPhone(user.prefs?.phone || ""); // 确保 phone 可用
       } catch (err) {
         setError("Failed to fetch user data.");
+        console.log(err);
       } finally {
         setLoading(false);
       }
@@ -39,19 +39,24 @@ export default function ProfilePage() {
       setSuccess("Profile updated successfully!");
     } catch (err) {
       setError("Failed to update profile.");
+      console.log(err);
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg p-8 w-96">
-        <h2 className="text-center text-2xl font-bold text-gray-700">Profile</h2>
+        <h2 className="text-center text-2xl font-bold text-gray-700">
+          Profile
+        </h2>
         {loading ? (
           <p className="text-center text-gray-500 mt-4">Loading...</p>
         ) : (
           <>
             {error && <p className="text-red-500 text-center mt-2">{error}</p>}
-            {success && <p className="text-green-500 text-center mt-2">{success}</p>}
+            {success && (
+              <p className="text-green-500 text-center mt-2">{success}</p>
+            )}
 
             <div className="space-y-4 mt-4">
               <div>
@@ -77,17 +82,23 @@ export default function ProfilePage() {
               <div>
                 <label className="text-gray-600">Phone</label>
                 <input
-                placeholder="Phone"
+                  placeholder="Phone"
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
-              <Button onClick={handleSave} className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+              <Button
+                onClick={handleSave}
+                className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+              >
                 Save
               </Button>
-              <Button onClick={() => redirect("/")} className="w-full mt-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition">
+              <Button
+                onClick={() => redirect("/")}
+                className="w-full mt-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition"
+              >
                 Return to Home
               </Button>
             </div>
@@ -97,4 +108,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
