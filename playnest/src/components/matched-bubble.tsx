@@ -31,7 +31,7 @@ export default function MatchedBubble({ matchedPeople }: MatchedBubbleProps) {
   return (
     <motion.div
       onClick={handleTap}
-      className="relative flex items-center justify-center rounded-full p-4 bg-green-500 shadow-lg cursor-pointer"
+      className="select-none relative flex items-center justify-center rounded-full p-4 bg-green-500 shadow-lg cursor-pointer"
       style={{
         width: "60vw",
         height: "60vw",
