@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { MdCancel } from "react-icons/md";
 
-type GameStatus = "pending" | "matched" | "joined";
+type GameStatus = "new" | "pending" | "matched" | "joined";
 
 export interface Game {
   id: string;
