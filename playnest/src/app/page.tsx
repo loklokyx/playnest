@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import GameBubble, { Game } from "@/components/game-bubble";
 import CreateGameModal from "@/components/create-game-modal";
 import { toast } from "sonner";
+import MatchedBubble, { MatchedPerson } from "@/components/matched-bubble";
 import { account } from "./(auth)/auth";
 import { redirect } from "next/navigation";
 
@@ -21,6 +22,12 @@ const game = {
   isOwner: false,
   joined: false,
 } as Game;
+
+const matchedPeople: MatchedPerson[] = [
+  { name: "John Doe", contactNo: "123-456-7890" },
+  { name: "Jane Smith", contactNo: "987-654-3210" },
+  { name: "Alice Johnson", contactNo: "555-555-5555" },
+];
 
 export default function Home() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -49,8 +56,7 @@ export default function Home() {
       setIsMenuOpen(false);
     } catch (error) {
       console.error("Logout failed:", error);
-    }
-    finally {
+    } finally {
       redirect("/login");
     }
   };
@@ -106,10 +112,10 @@ export default function Home() {
                   {isLoggedIn ? (
                     <div>
                       <button
-                      onClick={logout}
-                      className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100  cursor-pointer"
-                    >
-                      Logout
+                        onClick={logout}
+                        className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100  cursor-pointer"
+                      >
+                        Logout
                       </button>
                       <button
                         onClick={() => redirect("/profile")}
@@ -136,7 +142,11 @@ export default function Home() {
       {/* Game Bubble */}
       <div className="container mx-auto">
         <div className="w-full flex items-center justify-center py-4 pb-8">
-          <GameBubble game={game} onJoin={handleJoinGame} />
+          {game.status === "pending" ? (
+            <GameBubble game={game} onJoin={handleJoinGame} />
+          ) : game.status === "matched" ? (
+            <MatchedBubble matchedPeople={matchedPeople} />
+          ) : null}
         </div>
       </div>
 

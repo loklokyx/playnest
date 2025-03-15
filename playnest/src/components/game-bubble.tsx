@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { MdCancel } from "react-icons/md";
 
-type GameStatus = "pending" | "joined";
+type GameStatus = "pending" | "matched" | "joined";
 
 export interface Game {
   id: string;
@@ -63,13 +64,10 @@ export default function GameBubble({ game, onJoin }: GameBubbleProps) {
 
   // Slowly shrink back if not clicked
   useEffect(() => {
-    if (clickCount > 0 && !burst) {
+    if (!burst) {
       const timer = setTimeout(() => {
-        setSize((prev) => Math.max(1, prev - 0.01)); // Shrink back slowly
-        if (size <= 1.01) {
-          setClickCount(0);
-          setSize(1);
-        }
+        setSize((prev) => Math.max(1, prev * 0.97)); // Shrink back slowly
+        setClickCount((prev) => Math.max(0, prev - 1));
       }, 200);
 
       return () => clearTimeout(timer);
@@ -79,7 +77,7 @@ export default function GameBubble({ game, onJoin }: GameBubbleProps) {
   return (
     <motion.div
       onClick={handleTap}
-      className="relative flex items-center justify-center rounded-full p-4 bg-gradient-to-br from-indigo-400 to-purple-500 shadow-lg cursor-pointer"
+      className="select-none relative flex items-center justify-center rounded-full p-4 bg-gradient-to-br from-indigo-400 to-purple-500 shadow-lg cursor-pointer"
       style={{
         width: "60vw",
         height: "60vw",
@@ -94,9 +92,40 @@ export default function GameBubble({ game, onJoin }: GameBubbleProps) {
           <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></div>
         </div>
       )}
-      <div className="text-white font-bold text-2xl sm:text-6xl lg:text-8xl">
-        Join Game
-      </div>
+      {game.status === "pending" && (
+        <>
+          <MdCancel
+            className="absolute top-2 right-2 text-red-500"
+            size={40}
+            onClick={(e) => {
+              e.stopPropagation();
+              toast.info("You have canceled your request.");
+            }}
+          />
+          <div className="text-white">
+            <span className="font-bold text-2xl sm:text-6xl lg:text-8xl">
+              Speed Up
+            </span>
+            {/* Progress Bar */}
+            <div className="bg-gray-200 rounded-full my-4">
+              <div
+                className="h-2 bg-blue-500 rounded-full transition-all"
+                style={{
+                  width: `${((clickCount > MAX_COUNT ? MAX_COUNT : clickCount) / MAX_COUNT) * 100}%`,
+                }}
+              />
+            </div>
+            <div className="text-white text-sm sm:text-lg lg:text-2xl text-center">
+              <p>Type: {game.type}</p>
+              <p>Location: {game.location}</p>
+              <p>Time: {game.time}</p>
+              <p>
+                Players: {game.playersJoined}/{game.capacity}
+              </p>
+            </div>
+          </div>
+        </>
+      )}
     </motion.div>
   );
 }
