@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { account, ID } from "../auth";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   /**
    * Register a new account
@@ -18,7 +17,7 @@ const RegisterPage: React.FC = () => {
     setError(null);
     try {
       await account.create(ID.unique(), email, password, name);
-      router.push("/auth/login" as any); // Redirect to login page
+      redirect("/login"); // Redirect to login page
     } catch (err) {
       setError("Register failed. Please try again.");
       console.error("Register failed:", err);
@@ -28,9 +27,14 @@ const RegisterPage: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg p-8 w-96">
-        <h2 className="text-center text-2xl font-bold text-gray-700">Register</h2>
+        <h2 className="text-center text-2xl font-bold text-gray-700">
+          Register
+        </h2>
         {error && <p className="text-red-500 text-center mt-2">{error}</p>}
-        <form className="space-y-4 text-black" onSubmit={(e) => e.preventDefault()}>
+        <form
+          className="space-y-4 text-black"
+          onSubmit={(e) => e.preventDefault()}
+        >
           <input
             type="text"
             placeholder="Name"
@@ -62,7 +66,7 @@ const RegisterPage: React.FC = () => {
         </form>
         <p className="text-center text-sm mt-4">
           Already have an account?{" "}
-          <a href="/auth/login" className="text-blue-500 hover:underline">
+          <a href="/login" className="text-blue-500 hover:underline">
             Sign in now
           </a>
         </p>

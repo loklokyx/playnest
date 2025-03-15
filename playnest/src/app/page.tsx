@@ -1,37 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, User, Bell } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { Plus, User, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import GameBubble from "@/components/game-bubble";
+import GameBubble, { Game } from "@/components/game-bubble";
 import CreateGameModal from "@/components/create-game-modal";
-import { cn } from "@/lib/utils";
-import {
-  DndContext,
-  type DragEndEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import { account } from "@/app/auth/auth"
+import { toast } from "sonner";
+import { account } from "./(auth)/auth";
+import { redirect } from "next/navigation";
 
-
-// Update the game type to include position
-interface Game {
-  id: string;
-  type: string;
-  location: string;
-  time: string;
-  playersJoined: number;
-  capacity: number;
-  status: "pending" | "matched" | "finished";
-  isOwner: boolean;
-  joined: boolean;
-  position?: { x: number; y: number };
-}
-
+const game = {
+  id: "1",
+  type: "Uno",
+  location: "Library",
+  time: "3:00 PM",
+  playersJoined: 3,
+  capacity: 4,
+  status: "pending",
+  isOwner: false,
+  joined: false,
+} as Game;
 
 // Sample game data
 const initialGames = [
@@ -93,10 +82,8 @@ const initialGames = [
 ];
 
 export default function Home() {
-  const [games, setGames] = useState<Game[]>(initialGames as Game[]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
-  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -119,7 +106,7 @@ export default function Home() {
       await account.deleteSession("current");
       setIsLoggedIn(false);
       setIsMenuOpen(false);
-      router.push("/auth/login"); // redirect to login page
+      redirect("/auth/login"); // redirect to login page
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -129,75 +116,13 @@ export default function Home() {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  // Configure sensors for drag
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8, // 8px of movement required before drag starts
-      },
-    }),
-  );
-
-  const filteredGames = games.filter((game) => {
-    if (activeTab === "all") return true;
-    if (activeTab === "joined") return game.joined;
-    if (activeTab === "created") return game.isOwner;
-    return true;
-  });
-
   const handleJoinGame = (gameId: string) => {
-    setGames(
-      games.map((game) => {
-        if (game.id === gameId) {
-          return {
-            ...game,
-            joined: true,
-            playersJoined: game.playersJoined + 1,
-            status:
-              game.playersJoined + 1 >= game.capacity ? "matched" : game.status,
-          };
-        }
-        return game;
-      }),
-    );
+    toast.success(`joined game ${gameId}`);
   };
 
   const handleCreateGame = (newGame: Game) => {
-    setGames([
-      ...games,
-      {
-        ...newGame,
-        id: (games.length + 1).toString(),
-        playersJoined: 1,
-        status: "pending",
-        isOwner: true,
-        joined: true,
-      },
-    ]);
+    toast.success(`game created ${newGame}`);
     setIsCreateModalOpen(false);
-  };
-
-  // Handle drag end event
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, delta } = event;
-    const gameId = active.id as string;
-
-    setGames(
-      games.map((game) => {
-        if (game.id === gameId) {
-          // Calculate new position
-          const currentPosition = game.position || { x: 0, y: 0 };
-          return {
-            ...game,
-            position: {
-              x: currentPosition.x + delta.x,
-              y: currentPosition.y + delta.y,
-            },
-          };
-        }
-        return game;
-      }),
-    );
   };
 
   return (
@@ -244,7 +169,7 @@ export default function Home() {
                     </button>
                   ) : (
                     <button
-                      onClick={() => router.push("/auth/login")}
+                      onClick={() => redirect("/auth/login")}
                       className="w-full text-left px-4 py-2 text-indigo-600 hover:bg-gray-100 cursor-pointer"
                     >
                       Log in
@@ -257,71 +182,10 @@ export default function Home() {
         </div>
       </header>
     
-      {/* Tabs */}
-      <div className="container mx-auto px-4 pt-4">
-        <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
-          <Button
-            variant={activeTab === "all" ? "default" : "outline"}
-            className={cn(
-              "rounded-full",
-              activeTab === "all" ? "bg-indigo-600 hover:bg-indigo-700" : "",
-            )}
-            onClick={() => setActiveTab("all")}
-          >
-            All Games
-          </Button>
-          <Button
-            variant={activeTab === "joined" ? "default" : "outline"}
-            className={cn(
-              "rounded-full",
-              activeTab === "joined" ? "bg-indigo-600 hover:bg-indigo-700" : "",
-            )}
-            onClick={() => setActiveTab("joined")}
-          >
-            Joined
-          </Button>
-          <Button
-            variant={activeTab === "created" ? "default" : "outline"}
-            className={cn(
-              "rounded-full",
-              activeTab === "created"
-                ? "bg-indigo-600 hover:bg-indigo-700"
-                : "",
-            )}
-            onClick={() => setActiveTab("created")}
-          >
-            Created
-          </Button>
-        </div>
-      </div>
-
-      {/* Search */}
-      <div className="container mx-auto px-4 py-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <input
-            type="text"
-            placeholder="Search games..."
-            className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-      </div>
-
-      {/* Game Bubbles */}
-      <div className="container mx-auto px-4 py-6 flex-grow">
-        <div className="relative h-full min-h-[400px]">
-          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-            <AnimatePresence>
-              {filteredGames.map((game, index) => (
-                <GameBubble
-                  key={game.id}
-                  game={game}
-                  onJoin={handleJoinGame}
-                  index={index}
-                />
-              ))}
-            </AnimatePresence>
-          </DndContext>
+      {/* Game Bubble */}
+      <div className="container mx-auto">
+        <div className="w-full flex items-center justify-center py-4 pb-8">
+          <GameBubble game={game} onJoin={handleJoinGame} />
         </div>
       </div>
 
