@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { User, Bell } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Plus, Search, User, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import GameBubble, { Game } from "@/components/game-bubble";
 import { toast } from "sonner";
