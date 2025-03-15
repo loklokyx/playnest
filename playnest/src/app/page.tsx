@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, User, Bell } from "lucide-react";
+import { motion } from "framer-motion";
+import { User, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import GameBubble, { Game } from "@/components/game-bubble";
 import { toast } from "sonner";
@@ -143,7 +143,9 @@ export default function Home() {
             <GameBubble game={game} onJoin={handleJoinGame} />
           ) : game.status === "matched" ? (
             <MatchedBubble matchedPeople={matchedPeople} />
-          ) : "Error Status Found"}
+          ) : (
+            "Error Status Found"
+          )}
         </div>
       </div>
     </div>
