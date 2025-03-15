@@ -24,7 +24,7 @@ const LoginPage: React.FC = () => {
           redirect("/"); // ✅ Redirect to home or dashboard if user is already logged in
         }
       } catch (err) {
-        console.log("No active session, user not logged in.");
+        console.log("No active session, user not logged in.", err);
       }
     };
     checkUserSession();
@@ -60,29 +60,13 @@ const LoginPage: React.FC = () => {
   };
 
   if (loggedInUser) {
-    return (
-      <div className="mt-8 bg-white shadow-lg rounded-lg p-6 w-96 text-center">
-        <p className="text-gray-700 text-lg font-medium">
-           Logged in already:{" "}
-          <span className="font-semibold text-blue-500">
-            {loggedInUser.name}
-          </span>
-        </p>
-        <button
-          type="button"
-          onClick={logout}
-          className="mt-4 bg-blue-300 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition w-full cursor-pointer"
-        >
-          Logout
-        </button>
-      </div>
-    );
+    redirect("/"); // ✅ Redirect to home or dashboard if user is already logged in
   }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg p-8 w-96">
-        <h2 className="text-center text-2xl font-bold text-gray-700">Login</h2>
+        <h2 className="text-center text-2xl font-bold text-gray-700 mb-2">Login</h2>
         {error && <p className="text-red-500 text-center mt-2">{error}</p>}
         <form
           className="space-y-4 text-black"
@@ -112,7 +96,10 @@ const LoginPage: React.FC = () => {
         </form>
         <p className="text-center text-sm mt-4">
           Don&apos;t have an account yet?{" "}
-          <a href="/register" className="text-blue-500 hover:underline cursor-pointer">
+          <a
+            href="/register"
+            className="text-blue-500 hover:underline cursor-pointer"
+          >
             Register now
           </a>
         </p>

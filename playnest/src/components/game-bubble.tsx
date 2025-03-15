@@ -47,7 +47,7 @@ export default function GameBubble({ game, onJoin }: GameBubbleProps) {
               ? "You've requested to join this game. The owner will be notified."
               : "The game owner has been notified that you want to speed up the matching process.",
           );
-          onJoin;
+          onJoin(game.id);
         }
 
         // Reset after delay

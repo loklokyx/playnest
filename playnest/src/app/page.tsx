@@ -22,79 +22,20 @@ const game = {
   joined: false,
 } as Game;
 
-// Sample game data
-const initialGames = [
-  {
-    id: "1",
-    type: "Uno",
-    location: "Library",
-    time: "3:00 PM",
-    playersJoined: 3,
-    capacity: 4,
-    status: "pending",
-    isOwner: false,
-    joined: false,
-  },
-  {
-    id: "2",
-    type: "Mafia",
-    location: "Club Room",
-    time: "4:30 PM",
-    playersJoined: 5,
-    capacity: 8,
-    status: "pending",
-    isOwner: true,
-    joined: true,
-  },
-  {
-    id: "3",
-    type: "Mahjong",
-    location: "Student Center",
-    time: "5:00 PM",
-    playersJoined: 3,
-    capacity: 4,
-    status: "matched",
-    isOwner: false,
-    joined: true,
-  },
-  {
-    id: "4",
-    type: "Chess",
-    location: "Cafe",
-    time: "6:15 PM",
-    playersJoined: 1,
-    capacity: 2,
-    status: "pending",
-    isOwner: false,
-    joined: false,
-  },
-  {
-    id: "5",
-    type: "Monopoly",
-    location: "Dorm Lounge",
-    time: "7:30 PM",
-    playersJoined: 2,
-    capacity: 6,
-    status: "pending",
-    isOwner: false,
-    joined: false,
-  },
-];
-
 export default function Home() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("all");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-   // ✅ check if user is already logged in
-   useEffect(() => {
+  // ✅ check if user is already logged in
+  useEffect(() => {
     const checkUserSession = async () => {
       try {
         const user = await account.get();
         if (user) setIsLoggedIn(true);
       } catch (err) {
         setIsLoggedIn(false);
+        console.log(err);
       }
     };
     checkUserSession();
@@ -106,9 +47,11 @@ export default function Home() {
       await account.deleteSession("current");
       setIsLoggedIn(false);
       setIsMenuOpen(false);
-      redirect("/auth/login"); // redirect to login page
     } catch (error) {
       console.error("Logout failed:", error);
+    }
+    finally {
+      redirect("/login");
     }
   };
 
@@ -161,15 +104,23 @@ export default function Home() {
               {isMenuOpen && (
                 <div className="absolute right-0 mt-2 w-36 bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
                   {isLoggedIn ? (
-                    <button
+                    <div>
+                      <button
                       onClick={logout}
                       className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100  cursor-pointer"
                     >
                       Logout
-                    </button>
+                      </button>
+                      <button
+                        onClick={() => redirect("/profile")}
+                        className="w-full text-left px-4 py-2 text-indigo-600 hover:bg-gray-100 cursor-pointer"
+                      >
+                        Profile
+                      </button>
+                    </div>
                   ) : (
                     <button
-                      onClick={() => redirect("/auth/login")}
+                      onClick={() => redirect("/login")}
                       className="w-full text-left px-4 py-2 text-indigo-600 hover:bg-gray-100 cursor-pointer"
                     >
                       Log in
@@ -181,7 +132,7 @@ export default function Home() {
           </div>
         </div>
       </header>
-    
+
       {/* Game Bubble */}
       <div className="container mx-auto">
         <div className="w-full flex items-center justify-center py-4 pb-8">
