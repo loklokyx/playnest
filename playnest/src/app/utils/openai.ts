@@ -1,15 +1,15 @@
-import { getPendingGameRequests } from './api';
+import { getPendingGameRequests } from "./api"; // Adjust based on actual location
 import OpenAI from "openai";
-import { NextResponse } from "next/server";
+
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
-export async function GET() {
+export async function getMatchResults() {
   try {
     // Fetch pending game requests from Appwrite
     const gameRequests = await getPendingGameRequests();
 
     if (!gameRequests.length) {
-      return NextResponse.json({ message: "No pending game requests found." }, { status: 200 });
+      return { matchedGroups: [] };
     }
 
     // Construct OpenAI prompt
@@ -35,9 +35,9 @@ export async function GET() {
     // Parse response
     const matchedGroups = JSON.parse(response.choices[0].message.content || "[]");
 
-    return NextResponse.json({ matchedGroups });
+    return { matchedGroups };
   } catch (error) {
     console.error("Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    throw new Error("Failed to fetch match results from OpenAI.");
   }
 }
